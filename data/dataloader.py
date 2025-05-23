@@ -1,3 +1,5 @@
+import os
+
 from torch.utils.data import Dataset
 from PIL import Image
 
@@ -18,5 +20,5 @@ class OcclusionDetectionDataset(Dataset):
 
     def __getitem__(self, item):
         filename, label = self.samples[item]
-        img = Image.open(self.data_dir, filename).convert('RGB')
+        img = Image.open(os.path.join(self.data_dir, filename)).convert('RGB')
         return self.transform(img), int(label)

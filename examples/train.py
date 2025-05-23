@@ -41,32 +41,37 @@ def train_model(model, train_loader, val_loader, loss_func, opt, device=torch.de
 
     for epoch in tqdm(range(nums_epoch)):
         train_loss = 0.0
-        for images, labels in train_loader:
-            images, labels = images.to(device), labels.to(device)
-            opt.zero_grad()
-            outputs = model(images)
-            running_loss = loss_func(outputs, labels)
-            running_loss.backward()
-            train_loss += running_loss.item() * images.size(0)
-            opt.step()
+        with tqdm(train_loader,desc='train') as t:
+            for images, labels in t:
+                images, labels = images.to(device), labels.to(device)
+                opt.zero_grad()
+                outputs = model(images)
+                running_loss = loss_func(outputs, labels)
+                running_loss.backward()
+                train_loss += running_loss.item() * images.size(0)
+                opt.step()
+                t.set_postfix(loss=running_loss.item())
 
         train_loss = train_loss / len(train_loader.dataset)
         model.eval()
 
         val_loss = 0.0
         correct = 0
-        for images, labels in val_loader:
-            images, labels = images.to(device), labels.to(device)
-            outputs = model(images)
-            running_loss = loss_func(outputs, labels)
-            val_loss += running_loss.item() * images.size(0)
-            _, pred = outputs.max(1)
-            correct += pred.eq(labels).sum(0).item()
+        with tqdm(val_loader,desc='val') as t:
+            for images, labels in t:
+                images, labels = images.to(device), labels.to(device)
+                outputs = model(images)
+                running_loss = loss_func(outputs, labels)
+                val_loss += running_loss.item() * images.size(0)
+                _, pred = outputs.max(1)
+                correct += pred.eq(labels).sum(0).item()
+                t.set_postfix(loss = running_loss.item())
         val_loss = val_loss / len(val_loader.dataset)
         val_acc = 100. * correct / len(val_loader.dataset)
         if val_loss < best_val_loss:
             best_model = model.state_dict().copy()
             best_val_loss = val_loss
+            torch.save(best_model,'/Volumes/My Passport/dataset/models/trained/best.pth')
             print(f'Saved best model at epoch {epoch + 1}')
         print(f'Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.2f}%')
     model.load_state_dict(best_model)
@@ -74,4 +79,6 @@ def train_model(model, train_loader, val_loader, loss_func, opt, device=torch.de
 
 
 if __name__ == '__main__':
-    train_model(model, train_loader, val_loader, loss, opt, device, 100)
+    model = train_model(model, train_loader, val_loader, loss, opt, device, 100)
+    torch.save(model,'/Volumes/My Passport/dataset/models/trained/best.pth')
+
