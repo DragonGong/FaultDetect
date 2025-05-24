@@ -25,7 +25,7 @@ train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 
-model = OcclusionDetectionModel(base_model_path='/Volumes/My Passport/dataset/models/pretrained/resnet18-f37072fd.pth'
+model = OcclusionDetectionModel(load_pretrained=True,base_model_path='/Volumes/My Passport/dataset/models/pretrained/resnet18-f37072fd.pth'
                                 , freeze_pretrained=True)
 loss = nn.CrossEntropyLoss()
 opt = Adam(filter(lambda p:p.requires_grad ,  model.parameters()), lr=0.001)
