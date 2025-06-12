@@ -7,16 +7,12 @@ def way_func(img):
 
 
 build_datasets = BuildDatasets(
-    ori_data_paths=['/Volumes/My Passport/dataset/kitti/2011_09_26/2011_09_26_drive_0001_extract/image_00/data',
-                    '/Volumes/My Passport/dataset/kitti/2011_09_26/2011_09_26_drive_0001_extract/image_01/data',
-                    '/Volumes/My Passport/dataset/kitti/2011_09_26/2011_09_26_drive_0001_extract/image_02/data',
-                    '/Volumes/My Passport/dataset/kitti/2011_09_26/2011_09_26_drive_0001_extract/image_03/data',
-                    '/Volumes/My Passport/dataset/kitti/2011_09_26-1/2011_09_26_drive_0009_extract/image_00/data',
-                    '/Volumes/My Passport/dataset/kitti/2011_09_26-1/2011_09_26_drive_0009_extract/image_01/data',
-                    '/Volumes/My Passport/dataset/kitti/2011_09_26-1/2011_09_26_drive_0009_extract/image_02/data',
-                    '/Volumes/My Passport/dataset/kitti/2011_09_26-1/2011_09_26_drive_0009_extract/image_03/data',
+    ori_data_paths=['/Volumes/My Passport/dataset/kitti/2011_09_26-1/2011_09_26_drive_0002_extract/image_00/data',
+                    '/Volumes/My Passport/dataset/kitti/2011_09_26-1/2011_09_26_drive_0002_extract/image_01/data',
+                    '/Volumes/My Passport/dataset/kitti/2011_09_26-1/2011_09_26_drive_0002_extract/image_02/data',
+                    '/Volumes/My Passport/dataset/kitti/2011_09_26-1/2011_09_26_drive_0002_extract/image_03/data',
                     ]
-    , out_path='/Volumes/My Passport/dataset/kitti/data/train'
+    , out_path='/Volumes/My Passport/dataset/kitti/data/test'
     , way_func=way_func
 )
 
