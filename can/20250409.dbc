@@ -1,0 +1,126 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: HAD PDCU
+
+
+BO_ 162 IBC7: 8 Vector__XXX
+ SG_ IBC_VehicleSpeed : 7|13@0+ (0.05625,0) [0|270] "" Vector__XXX
+
+BO_ 1185 IBCM_TPMS2: 8 Vector__XXX
+ SG_ TPMS_LFTyreAirPressure : 7|8@0+ (0.0177,0) [0|4.4958] "" Vector__XXX
+
+BO_ 165 TAS_Info: 8 Vector__XXX
+ SG_ TAS_SAS_SteeringAngle : 7|16@0- (0.1,0) [0|0] "" Vector__XXX
+
+BO_ 935 IVI_ACC_1: 8 Vector__XXX
+ SG_ SGW_IVI_GyroX : 19|20@0- (0.001,0) [0|0] "" Vector__XXX
+ SG_ SGW_IVI_AccelX : 7|20@0- (2E-005,0) [0|0] "" Vector__XXX
+
+BO_ 785 SR_311: 8 Vector__XXX
+ SG_ SGW_IBC_PedalTravelSensorSt : 43|8@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 281 ACU_YRS_119: 8 Vector__XXX
+ SG_ ACU_LateralAccelarationSt : 19|12@0+ (0.01,-20) [-20|20] "" Vector__XXX
+
+BO_ 833 IBCM6: 8 Vector__XXX
+ SG_ VIUL_BattVoltSt : 7|10@0+ (0.05,0) [0|0] "" Vector__XXX
+
+BO_ 254 PDCU1: 8 PDCU
+ SG_ PDCU_Fault : 23|8@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 768 EMS8: 8 Vector__XXX
+ SG_ EMS_SystemErrorLevel : 47|3@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 886 APA2_PDC: 8 HAD
+ SG_ APA_ParkAssisRearSysSt : 3|2@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ APA_ParkAssistFrontSysSt : 1|2@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 994 PDCU_Disp5: 8 PDCU
+ SG_ PDCU_BMS_BattHealth : 47|10@0+ (0.1,0) [0|100] "" Vector__XXX
+
+
+
+CM_ SG_ 254 PDCU_Fault "VCU故障码
+0 无故障
+1 1级故障
+2 2级故障
+3 3级故障";
+CM_ SG_ 768 EMS_SystemErrorLevel "EMS系统故障等级
+0 正常无故障
+1 轻微故障
+2 有故障但EMS可启动
+3 有限制EMS性能的故障
+4 跛行故障
+5 无法启动
+6-7 预留";
+CM_ SG_ 886 APA_ParkAssisRearSysSt "倒车雷达工作状态
+0：Disable
+1：Enable激活
+2：Stanby准备
+3：System Failure系统故障";
+CM_ SG_ 886 APA_ParkAssistFrontSysSt "前进雷达工作状态
+0：Disable
+1：Enable激活
+2：Stanby准备
+3：System Failure系统故障";
+BA_DEF_ SG_  "GenSigSendType" ENUM  "Cyclic","OnWrite","OnWriteWithRepetition","OnChange","OnChangeWithRepetition","IfActive","IfActiveWithRepetition","NoSigSendType";
+BA_DEF_ SG_  "GenSigInactiveValue" INT 0 0;
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 0;
+BA_DEF_ BO_  "GenMsgSendType" ENUM  "Cyclic","not_used","not_used","not_used","not_used","Cyclic","not_used","IfActive","NoMsgSendType";
+BA_DEF_ BU_  "NmStationAddress" HEX 0 0;
+BA_DEF_  "DBName" STRING ;
+BA_DEF_  "BusType" STRING ;
+BA_DEF_ BU_  "NodeLayerModules" STRING ;
+BA_DEF_ BU_  "ECU" STRING ;
+BA_DEF_ BU_  "CANoeJitterMax" INT 0 0;
+BA_DEF_ BU_  "CANoeJitterMin" INT 0 0;
+BA_DEF_ BU_  "CANoeDrift" INT 0 0;
+BA_DEF_ BU_  "CANoeStartDelay" INT 0 0;
+BA_DEF_DEF_  "GenSigSendType" "Cyclic";
+BA_DEF_DEF_  "GenSigInactiveValue" 0;
+BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_DEF_DEF_  "GenMsgSendType" "NoMsgSendType";
+BA_DEF_DEF_  "NmStationAddress" 0;
+BA_DEF_DEF_  "DBName" "";
+BA_DEF_DEF_  "BusType" "CAN";
+BA_DEF_DEF_  "NodeLayerModules" "";
+BA_DEF_DEF_  "ECU" "";
+BA_DEF_DEF_  "CANoeJitterMax" 0;
+BA_DEF_DEF_  "CANoeJitterMin" 0;
+BA_DEF_DEF_  "CANoeDrift" 0;
+BA_DEF_DEF_  "CANoeStartDelay" 0;
+BA_ "DBName" "________";
+
