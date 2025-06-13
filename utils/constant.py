@@ -1,4 +1,14 @@
 
+END_OF_QUESTION = "<<END_OF_QUESTION>>"
+END_OF_ANSWER = "<<END_OF_ANSWER>>"
+END_OF_FILE = "<<END_OF_FILE>>"
+
+# 内容必须对应一致
+END_OF_QUESTION_BYTE = b"<<END_OF_QUESTION>>"
+END_OF_ANSWER_BYTE = b"<<END_OF_ANSWER>>"
+END_OF_FILE_BYTE = b"<<END_OF_FILE>>"
+
+ACK_BYTE = b"ACK\n"
 
 IMAGE_NOT_EXIST = 'The image file does not exist'
 
