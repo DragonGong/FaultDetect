@@ -173,6 +173,8 @@ import threading
 import gradio as gr
 import time
 import os
+import config
+from utils import END_OF_ANSWER_BYTE, END_OF_QUESTION, END_OF_FILE_BYTE
 
 dbc_file = '20250409.dbc'
 blf_file = 'logfile/Logging2025-04-09_11-23-34.blf'
@@ -221,9 +223,20 @@ def query_model(user_input):
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((HOST, PORT))
+            header = f"QUESTION\n"
+            s.sendall(header.encode('utf-8'))
+
+            ack = s.recv(1024)
+            print("head ack from server")
+
             payload = f"CAN:{current_can}\nUSER:{user_input}"
+            payload += END_OF_QUESTION
             s.sendall(payload.encode('utf-8'))
-            result = s.recv(8192).decode('utf-8')
+            result_data = b''
+            while END_OF_ANSWER_BYTE not in result_data:
+                result_data += s.recv(1024)
+            result_data = result_data.replace(END_OF_ANSWER_BYTE, b"")
+            result = result_data.decode('utf-8')
         return current_can, result
     except Exception as e:
         return current_can, f"连接错误: {e}"
@@ -239,6 +252,8 @@ def upload_document(file_obj):
             header = f"UPLOAD:{os.path.basename(file_path)}\n"
             s.sendall(header.encode('utf-8'))
 
+            ack = s.recv(1024)
+            print("head ack from server")
             with open(file_path, 'rb') as f:
                 while True:
                     chunk = f.read(4096)
@@ -246,7 +261,7 @@ def upload_document(file_obj):
                         break
                     s.sendall(chunk)
 
-            s.sendall(b"<<END_OF_FILE>>")
+            s.sendall(END_OF_FILE_BYTE)
             result = s.recv(4096).decode('utf-8')
             return "CAN信号未更新", result
     except Exception as e:

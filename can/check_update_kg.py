@@ -34,7 +34,7 @@ class check_kg:
     def transfer_prompt(self, user_input, graph):
         if "Battery Voltage" in user_input or "System Voltage" in user_input:
             return self.query_voltage_info(user_input, graph)
-        
+
         qa_prompt = PromptTemplate(input_variables=["context", "question"], template=self.cypher_qa_prompt)
         graph.refresh_schema()
         cypher_chain = GraphCypherQAChain.from_llm(
@@ -61,10 +61,10 @@ class check_kg:
         RETURN n
         """
         results = graph.query(cypher_query)
-        
+
         # 将查询结果转换为上下文信息
         context = "\n".join([str(node) for node in results])
-        
+
         # 使用上下文信息生成回答
         if "Battery Voltage is 20V" in user_input:
             question = "What is the possible fault code and solution for Battery Voltage is 20V?"
@@ -72,27 +72,25 @@ class check_kg:
             question = "What is the possible fault code and solution for System Voltage is 20V?"
         else:
             question = "What are the general issues related to Battery Voltage?"
-        
+
         qa_prompt = PromptTemplate(input_variables=["context", "question"], template=self.cypher_qa_prompt)
         response = qa_prompt.format(context=context, question=question)
-        
+
         return response
+
 
 class update_kg:
     def __init__(self):
         self.llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo")
-        
-    def process_document(self, file_path, graph):
-        file_extension = file_path.split('.')[-1].lower()
-        if file_extension == 'docx':
-            loader = UnstructuredWordDocumentLoader(file_path)
-        elif file_extension == 'txt':
-            loader = TextLoader(file_path, encoding='utf-8')
-        else:
+
+    def process_document(self, file_name, file_str, graph):
+        file_extension = file_name.split('.')[-1].lower()
+        if not (file_extension == 'docx' or file_extension == 'txt'):
             raise ValueError("不支持的文件格式，目前只支持txt和docx格式")
-            
-        documents = loader.load()
-        
+
+        documents = [
+            Document(page_content=file_str)
+        ]
         # 使用更智能的文本分割策略
         text_splitter = CharacterTextSplitter(
             separator="\n\n",  # 按段落分割
@@ -100,13 +98,12 @@ class update_kg:
             chunk_overlap=300,
             length_function=len,
         )
-        
+
         texts = text_splitter.split_documents(documents)
         print(f"type of texts: {type(texts)}")
         # 处理每个文本块
         for document in texts:
             print(f'document type: {type(document)}')
-            # print(f'document', document)  # 打印前100个字符
             text = document.page_content
             system_prompt = """You are a car maintenance engineer. Please analyze the following text and:
             1. Identify key maintenance concepts, problems, and solutions
@@ -130,7 +127,7 @@ class update_kg:
             print("llm_process done")
             print(llm_response.content)
             self.update_graph(llm_response.content, graph)
-            
+
     def update_graph(self, llm_response, graph):
         # 添加同义词处理
         system_prompt = """For the following vehicle diagnostic information, please:
