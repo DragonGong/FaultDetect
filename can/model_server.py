@@ -74,8 +74,11 @@ from langchain import PromptTemplate
 from langchain_community.graphs import Neo4jGraph
 from langchain_experimental.graph_transformers import LLMGraphTransformer
 from langchain_openai import ChatOpenAI
+
+import utils
 from check_update_kg import check_kg, update_kg
 from config import NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD, OPENAI_API_KEY, OPENAI_API_BASE
+from utils import END_OF_FILE_BYTE, END_OF_QUESTION_BYTE, END_OF_ANSWER, END_OF_QUESTION
 
 # 直接使用这些变量
 # 环境配置
@@ -125,70 +128,100 @@ if __name__ == "__main__":
             conn, addr = s.accept()
             with conn:
                 try:
-                    data = conn.recv(4096)
-                    if not data:
-                        continue
+                    header = b""
+                    while b"\n" not in header:
+                        header += conn.recv(1024)
+                    header_str =  header.decode('utf-8').strip()
+                    print("header :"+header_str)
+                    conn.sendall(utils.ACK_BYTE)
+                    if header_str.startswith("UPLOAD"):
+                        filename = header_str.split(':')[1]
+                        file_data = b''
+                        while END_OF_FILE_BYTE not in file_data:
+                            file_data += conn.recv(1024)
+                        file_data = file_data.replace(END_OF_FILE_BYTE,b'')
 
-                    decoded = data.decode('utf-8', errors='ignore')
-                    if decoded.startswith("UPLOAD:"):
-                        filename = decoded.split(":", 1)[1].strip()
-                        update.process_document(filename, graph)
+                        update.process_document(filename ,str(file_data.decode('utf-8')) , graph)
                         conn.sendall("知识库文件处理完成，已更新至图谱。".encode('utf-8'))
-                        continue 
-                        # save_path = f"uploaded_{filename}"
-
-                        # with open(save_path, "wb") as f:
-                        #     while True:
-                        #         chunk = conn.recv(4096)
-                        #         if b"<<END_OF_FILE>>" in chunk:
-                        #             chunk = chunk.replace(b"<<END_OF_FILE>>", b"")
-                        #             f.write(chunk)
-                        #             break
-                        #         f.write(chunk)
-                        
-                        # try:
-                        #     # 确保文件存在且可读
-                        #     if os.path.exists(save_path) and os.path.getsize(save_path) > 0:
-                        #         # 添加调试信息
-                        #         print(f"处理文件: {save_path}")
-                        #         print(f"文件大小: {os.path.getsize(save_path)} 字节")
-                                
-                        #         # 确保文件完全写入磁盘
-                        #         import time
-                        #         time.sleep(0.5)  # 给文件系统一点时间
-                                
-                        #         # 将相对路径转为绝对路径
-                        #         abs_path = os.path.abspath(save_path)
-                        #         print(f"使用绝对路径: {save_path}")
-                        #         print(f"type: {type(abs_path)}")
-                        #         # save_path = 'demo/dmo.txt'
-                                
-                        #         # 使用绝对路径调用处理方法
-                        #         update.process_document(abs_path, graph)
-                        #         conn.sendall("知识库文件处理完成，已更新至图谱。".encode('utf-8'))
-                        #     else:
-                        #         conn.sendall("文件上传失败或为空文件。".encode('utf-8'))
-                        # except Exception as e:
-                        #     import traceback
-                        #     error_details = traceback.format_exc()
-                        #     print(f"文件处理错误详情: {error_details}")
-                        #     conn.sendall(f"处理文件时出错: {str(e)}".encode('utf-8'))
-                        # finally:
-                        #     # 无论成功与否都清理文件
-                        #     if os.path.exists(save_path):
-                        #         continue
-                        #         # os.remove(save_path)
-                        # continue
-
-            
-                    
-                    # 正常问题问答处理
-                    parts = decoded.strip().split('\n')
-                    can_data = parts[0].replace("CAN:", "").strip()
-                    user_input = parts[1].replace("USER:", "").strip()
-
-                    result = handle_request(user_input, can_data)
-                    conn.sendall(result.encode('utf-8'))
-
+                    else:
+                        question_data = b''
+                        while END_OF_QUESTION_BYTE not in question_data:
+                            question_data += conn.recv(1024)
+                        parts = question_data.decode('utf-8').strip().split('\n')
+                        can_data = parts[0].replace("CAN:", "").strip()
+                        user_input = parts[1].replace("USER:", "").strip()
+                        user_input = user_input.replace(END_OF_QUESTION,"")
+                        result = str(handle_request(user_input, can_data))+END_OF_ANSWER
+                        conn.sendall(result.encode('utf-8'))
                 except Exception as e:
-                    conn.sendall(f"处理出错: {str(e)}".encode('utf-8'))
+                    print(f"发生其他错误: {e}")
+                    import traceback
+                    traceback.print_exc()
+
+                # data = conn.recv(4096)
+                # if not data:
+                #     continue
+                #
+                # decoded = data.decode('utf-8', errors='ignore')
+                # if decoded.startswith("UPLOAD:"):
+                #     filename = decoded.split(":", 1)[1].strip()
+                #     update.process_document(filename, graph)
+                #     conn.sendall("知识库文件处理完成，已更新至图谱。".encode('utf-8'))
+                #     continue
+                    # save_path = f"uploaded_{filename}"
+
+                    # with open(save_path, "wb") as f:
+                    #     while True:
+                    #         chunk = conn.recv(4096)
+                    #         if b"<<END_OF_FILE>>" in chunk:
+                    #             chunk = chunk.replace(b"<<END_OF_FILE>>", b"")
+                    #             f.write(chunk)
+                    #             break
+                    #         f.write(chunk)
+
+                    # try:
+                    #     # 确保文件存在且可读
+                    #     if os.path.exists(save_path) and os.path.getsize(save_path) > 0:
+                    #         # 添加调试信息
+                    #         print(f"处理文件: {save_path}")
+                    #         print(f"文件大小: {os.path.getsize(save_path)} 字节")
+
+                    #         # 确保文件完全写入磁盘
+                    #         import time
+                    #         time.sleep(0.5)  # 给文件系统一点时间
+
+                    #         # 将相对路径转为绝对路径
+                    #         abs_path = os.path.abspath(save_path)
+                    #         print(f"使用绝对路径: {save_path}")
+                    #         print(f"type: {type(abs_path)}")
+                    #         # save_path = 'demo/dmo.txt'
+
+                    #         # 使用绝对路径调用处理方法
+                    #         update.process_document(abs_path, graph)
+                    #         conn.sendall("知识库文件处理完成，已更新至图谱。".encode('utf-8'))
+                    #     else:
+                    #         conn.sendall("文件上传失败或为空文件。".encode('utf-8'))
+                    # except Exception as e:
+                    #     import traceback
+                    #     error_details = traceback.format_exc()
+                    #     print(f"文件处理错误详情: {error_details}")
+                    #     conn.sendall(f"处理文件时出错: {str(e)}".encode('utf-8'))
+                    # finally:
+                    #     # 无论成功与否都清理文件
+                    #     if os.path.exists(save_path):
+                    #         continue
+                    #         # os.remove(save_path)
+                    # continue
+
+
+
+                # 正常问题问答处理
+                # parts = decoded.strip().split('\n')
+                # can_data = parts[0].replace("CAN:", "").strip()
+                # user_input = parts[1].replace("USER:", "").strip()
+                #
+                # result = handle_request(user_input, can_data)
+                # conn.sendall(result.encode('utf-8'))
+                #
+                # except Exception as e:
+                #     conn.sendall(f"处理出错: {str(e)}".encode('utf-8'))
