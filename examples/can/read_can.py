@@ -3,7 +3,7 @@ import cantools
 
 # Step 1: 加载 DBC 文件
 
-dbc_file = '../doc/20250409.dbc'
+dbc_file = 'assets/20250409.dbc'
 db = cantools.database.load_file(dbc_file)
 # # 初始化 Kvaser CAN 通道
 bus = can.interface.Bus(
