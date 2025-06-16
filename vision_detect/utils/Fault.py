@@ -4,7 +4,7 @@ import random
 import cv2
 import numpy as np
 from loguru import logger
-from utils import constant
+from vision_detect.utils import constant
 from PIL import Image
 
 def add_random_occlusion(img, occlusion_ratio=0.4):

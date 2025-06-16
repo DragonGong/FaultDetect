@@ -1,0 +1,16 @@
+neo4j:
+  uri: ""
+  username: ""
+  password: ""
+
+openai:
+  api_key: ""
+  api_base: ""
+
+ui_client:
+  host: "127.0.0.1"
+  port: 65433
+
+model_server:
+  host: "127.0.0.1"
+  port: 65433

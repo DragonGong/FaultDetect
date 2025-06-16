@@ -1,5 +1,5 @@
-from utils.Fault import add_random_occlusion_random_ratio
-from data.build import BuildDatasets
+from vision_detect.utils.Fault import add_random_occlusion_random_ratio
+from vision_detect.data import BuildDatasets
 
 
 def way_func(img):

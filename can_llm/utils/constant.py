@@ -12,3 +12,6 @@ ACK_BYTE = b"ACK\n"
 
 IMAGE_NOT_EXIST = 'The image file does not exist'
 
+# read mode
+READ_REALTIME = "RT"
+READ_REPLAY = "RP"
