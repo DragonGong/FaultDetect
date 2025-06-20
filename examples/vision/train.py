@@ -1,9 +1,9 @@
-from data.dataloader import OcclusionDetectionDataset
+from vision_detect.data.dataloader import OcclusionDetectionDataset
 from torchvision import transforms
 from torch.utils.data import DataLoader, random_split
 from torch import nn
 from torch.optim import Adam
-from models.OcclusionDetectionModel import OcclusionDetectionModel
+from vision_detect.models.OcclusionDetectionModel import OcclusionDetectionModel
 from tqdm import tqdm
 import torch
 
