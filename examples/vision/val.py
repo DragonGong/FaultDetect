@@ -1,5 +1,5 @@
 import torch
-from vision_detect.models.OcclusionDetectionModel import OcclusionDetectionModel
+from vision_detect.models.occlusion_detection_model import OcclusionDetectionModel
 from PIL import Image
 
 model_state_path = '/Volumes/My Passport/dataset/models/trained/best.pth'

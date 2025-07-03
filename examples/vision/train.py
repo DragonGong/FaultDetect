@@ -3,7 +3,7 @@ from torchvision import transforms
 from torch.utils.data import DataLoader, random_split
 from torch import nn
 from torch.optim import Adam
-from vision_detect.models.OcclusionDetectionModel import OcclusionDetectionModel
+from vision_detect.models.occlusion_detection_model import OcclusionDetectionModel
 from tqdm import tqdm
 import torch
 
