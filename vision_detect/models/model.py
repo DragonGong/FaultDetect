@@ -6,9 +6,8 @@ import torch
 
 
 class Model(ABC, nn.Module):
-    def __init__(self, model: nn.Module):
+    def __init__(self):
         super().__init__()
-        self.model = model
 
     @abstractmethod
     def preprocess(self, image: Image.Image, device: str) -> torch.Tensor:
