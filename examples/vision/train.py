@@ -30,7 +30,8 @@ model = OcclusionDetectionModel(load_pretrained=True,base_model_path='/Volumes/M
 loss = nn.CrossEntropyLoss()
 opt = Adam(filter(lambda p:p.requires_grad ,  model.parameters()), lr=0.001)
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device('mps')
 model.to(device)
 
 
@@ -71,7 +72,7 @@ def train_model(model, train_loader, val_loader, loss_func, opt, device=torch.de
         if val_loss < best_val_loss:
             best_model = model.state_dict().copy()
             best_val_loss = val_loss
-            torch.save(best_model,'/Volumes/My Passport/dataset/models/trained/best.pth')
+            torch.save(best_model,'/Volumes/My Passport/dataset/models/trained/best_resnet_for_faultdetect.pth')
             print(f'Saved best model at epoch {epoch + 1}')
         print(f'Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.2f}%')
     model.load_state_dict(best_model)
@@ -80,5 +81,5 @@ def train_model(model, train_loader, val_loader, loss_func, opt, device=torch.de
 
 if __name__ == '__main__':
     model = train_model(model, train_loader, val_loader, loss, opt, device, 100)
-    torch.save(model,'/Volumes/My Passport/dataset/models/trained/best.pth')
+    torch.save(model.state_dict(),'/Volumes/My Passport/dataset/models/trained/final_resnet_for_faultdetect.pth')
 

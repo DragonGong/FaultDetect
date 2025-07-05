@@ -18,7 +18,7 @@ class CameraDetect:
             self.camera_readers = [cameras]
 
     def detect_pic_from_one_camera(self, device: str = "") -> ModelIO:
-        image = self.camera_readers[0].read_image()
+        image = self.camera_readers[0].read_image_plt()
         if device == "":
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         return self.model_service.predict_one(device=device, image=image)
@@ -28,5 +28,5 @@ class CameraDetect:
         if device == "":
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         for camera in self.camera_readers:
-            output.append(self.model_service.predict_one(device=device, image=camera.read_image()))
+            output.append(self.model_service.predict_one(device=device, image=camera.read_image_plt()))
         return output

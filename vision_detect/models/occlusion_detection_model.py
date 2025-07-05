@@ -36,6 +36,7 @@ class OcclusionDetectionModel(Model):
         return self.base_model(x)
 
     def transform_val(self, image: Image.Image) -> torch.Tensor:
+        assert isinstance(image,Image.Image),"Expected the image a Image.Image type."
         transform = transforms.Compose(
             [
                 transforms.Resize((224, 224)),
@@ -43,6 +44,7 @@ class OcclusionDetectionModel(Model):
                 transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
             ]
         )
+        # the image
         return transform(image)
 
     def preprocess(self, image: Image.Image, device: str) -> torch.Tensor:
@@ -52,5 +54,6 @@ class OcclusionDetectionModel(Model):
         return image_tensor.unsqueeze(0)
 
     def transform_output(self, output: ModelIO):
+        assert isinstance(output,ModelIO) , "Expected output a ModelIO type."
         _, batch_max = output.odm_io.output_origin.max(1)
         output.odm_io.output_transformed = batch_max[0].item()
