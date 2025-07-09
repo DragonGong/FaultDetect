@@ -28,9 +28,25 @@ def task_2():
     def print_func(io: ModelIO):
         print(io.odm_io)
 
-    detect.detect_realtime_from_one_camera(q, "mps", opt=print_func,show_image=True)
+    detect.detect_realtime_from_one_camera(q, "mps", opt=print_func, show_image=True)
+
+
+def task_3():
+    save_path = "assets/image"
+    camera_readers = [CameraReader(usb_port=0, save_location=save_path),
+                      CameraReader(usb_port=1, save_location=save_path)]
+    model = OcclusionDetectionModel()
+    service = ModelService(model, '/Volumes/My Passport/dataset/models/trained/best_resnet_for_faultdetect.pth', "mps")
+    detect = CameraDetect(service, camera_readers)
+    q = Queue()
+
+    def print_func(io: ModelIO):
+        print(io.odm_io)
+
+    detect.detect_realtime_from_cameras_serial(q, "mps", opt=print_func, show_image=True)
 
 
 if __name__ == "__main__":
     # task_1()
-    task_2()
+    # task_2()
+    task_3()

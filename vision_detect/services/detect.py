@@ -58,6 +58,7 @@ class CameraDetect:
         while True:
             frame = queue.get()
 
+            # todo:temporary plan: show_image should stay in class camera
             if show_image:
                 cv_frame = ImageUtils.pil_rgb_2_cv2_bgr(frame=frame)
                 ImageUtils.show_image_plt(frame=cv_frame)
@@ -70,8 +71,19 @@ class CameraDetect:
                 opt(output)
 
     def detect_realtime_from_one_camera(self, queue: Queue = None, device: Optional[str] = None, fps: int = 1,
-                                        get_switch: bool = True, opt: Optional[Callable[[ModelIO], None]] = None,
+                                        get_switch: bool = False, opt: Optional[Callable[[ModelIO], None]] = None,
                                         show_image: bool = False):
+        """
+
+        :param queue:
+        :param device:
+        :param fps:
+        :param get_switch: if false,you will not get data from queue ,
+         the data in queue would be gotten into opt function.
+        :param opt:
+        :param show_image:
+        :return:
+        """
         if queue is None:
             queue = Queue()
             get_switch = False
@@ -79,7 +91,7 @@ class CameraDetect:
         p.daemon = True
         p.start()
         # for user to get data from queue
-        if get_switch:
+        if not get_switch:
             self._process_frames_from_queue(
                 queue=queue,
                 device=device,
@@ -87,22 +99,25 @@ class CameraDetect:
                 opt=opt
             )
 
+    @staticmethod
+    def realtime_read(q: Queue, f: int, readers: List[CameraReader]):
+        while True:
+            for c in readers:
+                q.put(c.read_image_plt())
+            time.sleep(TimeUtils.seconds_per_frame(f))
+
     def detect_realtime_from_cameras_serial(self, queue: Queue = None, device: Optional[str] = None, fps: int = 1,
-                                            get_switch: bool = True, opt: Optional[Callable[[ModelIO], None]] = None,
+                                            get_switch: bool = False, opt: Optional[Callable[[ModelIO], None]] = None,
                                             show_image: bool = False):
         if queue is None:
             queue = Queue()
             get_switch = False
 
-        def realtime_read():
-            while True:
-                for c in self.camera_readers:
-                    queue.put(c.read_image_plt())
-                time.sleep(TimeUtils.seconds_per_frame(fps))
-
-        p = Process(target=realtime_read())
+        # todo:realtime_read is replaced by class camera_reader's function
+        p = Process(target=CameraDetect.realtime_read, args=(queue, fps, self.camera_readers))
         p.daemon = True
-        if get_switch:
+        p.start()
+        if not get_switch:
             self._process_frames_from_queue(
                 queue=queue,
                 device=device,
