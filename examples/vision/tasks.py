@@ -28,7 +28,7 @@ def task_2():
     def print_func(io: ModelIO):
         print(io.odm_io)
 
-    detect.detect_realtime_from_one_camera(q, "mps", opt=print_func)
+    detect.detect_realtime_from_one_camera(q, "mps", opt=print_func,show_image=True)
 
 
 if __name__ == "__main__":

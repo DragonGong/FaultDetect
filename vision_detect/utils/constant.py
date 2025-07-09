@@ -10,3 +10,7 @@ class ImageType(Enum):
     NUMPY = "NUMPY"
 
 
+class ErrorMsg:
+    @staticmethod
+    def get_type_error_msg(expected_type, actual_type):
+        return f"Expected {expected_type}, get wrong type: {actual_type}"

@@ -1,3 +1,5 @@
+import cv2
+from vision_detect.utils.image import ImageUtils
 import time
 from vision_detect.utils.time import TimeUtils
 import torch
@@ -26,7 +28,7 @@ class CameraDetect:
         image = self.camera_readers[0].read_image_plt()
         if save:
             if file_name is not None:
-                self.camera_readers[0].capture_and_save(image,file_name)
+                self.camera_readers[0].capture_and_save(image, file_name)
             else:
                 self.camera_readers[0].capture_and_save(image)
         if device == "" or device is None:
@@ -48,12 +50,62 @@ class CameraDetect:
             output.append(self.model_service.predict_one(device=device, image=image))
         return output
 
-    def detect_realtime_from_one_camera(self, queue: Queue, device: Optional[str] = None, fps: int = 1,
-                                        get_switch: bool = True, opt: Optional[Callable[[ModelIO], None]] = None):
-        p = Process(target=self.camera_readers[0].realtime_capture, args=(queue, ImageType.IMAGE, fps))
-        p.start()
-        while get_switch:
+    def _process_frames_from_queue(self,
+                                   queue: Queue,
+                                   device: Optional[str],
+                                   show_image: bool,
+                                   opt: Optional[Callable[[ModelIO], None]]) -> None:
+        while True:
             frame = queue.get()
+
+            if show_image:
+                cv_frame = ImageUtils.pil_rgb_2_cv2_bgr(frame=frame)
+                ImageUtils.show_image_plt(frame=cv_frame)
+                if cv2.waitKey(100) == ord('q'):
+                    break
+
             output = self.model_service.predict_one(device=device, image=frame)
+
             if opt is not None:
                 opt(output)
+
+    def detect_realtime_from_one_camera(self, queue: Queue = None, device: Optional[str] = None, fps: int = 1,
+                                        get_switch: bool = True, opt: Optional[Callable[[ModelIO], None]] = None,
+                                        show_image: bool = False):
+        if queue is None:
+            queue = Queue()
+            get_switch = False
+        p = Process(target=self.camera_readers[0].realtime_capture, args=(queue, ImageType.IMAGE, fps))
+        p.daemon = True
+        p.start()
+        # for user to get data from queue
+        if get_switch:
+            self._process_frames_from_queue(
+                queue=queue,
+                device=device,
+                show_image=show_image,
+                opt=opt
+            )
+
+    def detect_realtime_from_cameras_serial(self, queue: Queue = None, device: Optional[str] = None, fps: int = 1,
+                                            get_switch: bool = True, opt: Optional[Callable[[ModelIO], None]] = None,
+                                            show_image: bool = False):
+        if queue is None:
+            queue = Queue()
+            get_switch = False
+
+        def realtime_read():
+            while True:
+                for c in self.camera_readers:
+                    queue.put(c.read_image_plt())
+                time.sleep(TimeUtils.seconds_per_frame(fps))
+
+        p = Process(target=realtime_read())
+        p.daemon = True
+        if get_switch:
+            self._process_frames_from_queue(
+                queue=queue,
+                device=device,
+                show_image=show_image,
+                opt=opt
+            )

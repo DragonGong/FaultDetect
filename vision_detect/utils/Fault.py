@@ -7,6 +7,7 @@ from loguru import logger
 from vision_detect.utils import constant
 from PIL import Image
 
+
 def add_random_occlusion(img, occlusion_ratio=0.4):
     img = np.array(img)
     h, w = img.shape[:2]
