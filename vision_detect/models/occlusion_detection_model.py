@@ -48,7 +48,7 @@ class OcclusionDetectionModel(Model):
         return transform(image)
 
     def preprocess(self, image: Image.Image, device: str) -> torch.Tensor:
-        if device == "":
+        if device == "" or device is None:
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         image_tensor = self.transform_val(image).to(device)
         return image_tensor.unsqueeze(0)

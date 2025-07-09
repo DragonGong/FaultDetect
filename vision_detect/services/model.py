@@ -8,7 +8,7 @@ from PIL import Image
 class ModelService:
     def __init__(self, model: Model, state_path: str, device: str = ""):
         self.model = model
-        if device == "":
+        if device == "" or device is None:
             device_torch = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         else:
             device_torch = torch.device(device)
