@@ -28,7 +28,8 @@ class CameraReader:
     def _pil2cv(self, data: Image.Image) -> np.ndarray:
         return np.array(data)
 
-    def read_image_np(self) -> np.ndarray:
+    # basic image read function
+    def _read_image_np(self) -> np.ndarray:
         cap = cv2.VideoCapture(self.usb_port)
         if not cap.isOpened():
             logging.error(f"无法打开摄像头端口 {self.usb_port}")
@@ -41,6 +42,7 @@ class CameraReader:
             if not ret:
                 logging.error(f"无法读取图像帧")
                 time.sleep(1)
+                cap = cv2.VideoCapture(self.usb_port)
             else:
                 break
 
@@ -49,12 +51,12 @@ class CameraReader:
     def read_images_np(self, count=1) -> [np.ndarray]:
         images = []
         for _ in range(count):
-            image = self.read_image_np()
+            image = self._read_image_np()
             images.append(image)
         return images
 
     def read_image_plt(self) -> Image.Image:
-        return self._cv2pil(self.read_image_np())
+        return self._cv2pil(self._read_image_np())
 
     def read_images_plt(self, count: int) -> List[Image.Image]:
         images = []
@@ -64,7 +66,7 @@ class CameraReader:
 
     def capture_and_save(self, image=None, filename=None):
         if image is None:
-            image = self.read_image_np()
+            image = self._read_image_np()
 
         if filename is None:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -83,5 +85,5 @@ class CameraReader:
             if image_type == ImageType.IMAGE:
                 q.put(self.read_image_plt())
             elif image_type == ImageType.NUMPY:
-                q.put(self.read_image_np())
+                q.put(self._read_image_np())
             time.sleep(t)
