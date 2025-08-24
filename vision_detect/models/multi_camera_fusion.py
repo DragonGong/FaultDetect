@@ -84,6 +84,7 @@ class MultiCameraFusion(Model):
         # the image
         return transform(image)
 
+    # todo:fix it
     def preprocess(self, image: Image.Image, device: str) -> torch.Tensor:
         if device == "" or device is None:
             device = torch.device('cuda' if torch.cuda.is_available() else "cpu")

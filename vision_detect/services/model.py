@@ -17,8 +17,17 @@ class ModelService:
         self.model.to(device_torch)
         self.model.eval()
 
+    def predict(self, device: str, io: ModelIO) -> ModelIO:
+        input_tensor = self.model.preprocess(io, device)
+        io.odm_io.output_origin = self.model(input_tensor)
+        self.model.transform_output(io)
+        output = io
+        return output
+
     def predict_one(self, device: str, image: Image.Image) -> ModelIO:
-        image_tensor = self.model.preprocess(image, device)
+        io = ModelIO()
+        io.odm_io.input = image
+        image_tensor = self.model.preprocess(io, device)
         output_origin = ModelIO()
         output_origin.odm_io.output_origin = self.model(image_tensor)
         self.model.transform_output(output_origin)
