@@ -38,7 +38,7 @@ def visualize_occlusion_result(
                 (10, frame.shape[0] - 20), cv2.FONT_HERSHEY_SIMPLEX, 1,
                 color, 3)
 
-    win_name = f"Camera {frame_result.ID}"
+    win_name = f"Camera {int(frame_result.ID) - 1}"
     cv2.namedWindow(win_name, cv2.WINDOW_NORMAL)
 
     screen_w, screen_h = 1470, 956
@@ -126,7 +126,7 @@ def task_5():
     service = ModelService(model, '/Volumes/My Passport/dataset/models/trained/7_22/best.pth', "mps")
     detect = CameraDetect(service, camera_readers)
     q = Queue()
-    detect.detect_realtime_from_cameras_serial(q, "mps", opt=visualize_occlusion_result, show_image=True)
+    detect.detect_realtime_from_cameras_serial(q, "mps", opt=visualize_occlusion_result, show_image=True,fps=10)
 
 
 if __name__ == "__main__":
