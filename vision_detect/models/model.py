@@ -10,7 +10,7 @@ class Model(ABC, nn.Module):
         super().__init__()
 
     @abstractmethod
-    def preprocess(self, image: Image.Image, device: str) -> torch.Tensor:
+    def preprocess(self, io: ModelIO, device: str) -> torch.Tensor:
         pass
 
     @abstractmethod
