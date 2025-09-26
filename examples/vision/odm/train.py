@@ -81,5 +81,6 @@ def train_model(model, train_loader, val_loader, loss_func, opt, device=torch.de
 
 
 if __name__ == '__main__':
+    # 不是随便改的
     model = train_model(model, train_loader, val_loader, loss, opt, device, 30)
     torch.save(model.state_dict(), '/Volumes/My Passport/dataset/models/trained/7_22/final.pth')
