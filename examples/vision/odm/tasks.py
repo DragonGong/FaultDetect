@@ -1,4 +1,6 @@
 # read pics from some cameras and detect the fault by resnet
+import logging
+
 from vision_detect.services.detect import CameraDetect
 from vision_detect.services.model import ModelService
 from vision_detect.data.device.camera import CameraReader
@@ -61,6 +63,7 @@ def visualize_occlusion_result(
     cv2.resizeWindow(win_name, win_w, win_h)
 
     cv2.imshow(win_name, frame)
+    cv2.waitKey(1)
 
 
 def task_1():
@@ -121,12 +124,13 @@ def task_5():
     save_path = "assets/image"
     camera_readers = [CameraReader(usb_port=0, save_location=save_path),
                       CameraReader(usb_port=1, save_location=save_path)]
-    # camera_readers = [CameraReader(usb_port=1,save_location=save_path)]
+    # camera_readers = [CameraReader(usb_port=0,save_location=save_path)]
     model = OcclusionDetectionModel()
-    service = ModelService(model, '/Volumes/My Passport/dataset/models/trained/7_22/best.pth', "mps")
+    service = ModelService(model, r"assets/odm_model/best.pth", "cpu")
+    print("model is loaded")
     detect = CameraDetect(service, camera_readers)
     q = Queue()
-    detect.detect_realtime_from_cameras_serial(q, "mps", opt=visualize_occlusion_result, show_image=True,fps=10)
+    detect.detect_realtime_from_cameras_serial(q, "cpu", opt=visualize_occlusion_result, show_image=False,fps=100)
 
 
 if __name__ == "__main__":
