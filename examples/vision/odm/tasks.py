@@ -15,7 +15,7 @@ from PIL import Image
 from typing import List, Tuple
 import tkinter as tk
 
-
+from queue import Queue as tQueue
 def visualize_occlusion_result(
         model_io: ModelIO,
         window_shape: Tuple[int, int] = (2, 2)  # 行数, 列数，比如 (2,2) 表示 2x2 排列窗口
@@ -129,11 +129,27 @@ def task_5():
     service = ModelService(model, r"assets/odm_model/best.pth", "cpu")
     print("model is loaded")
     detect = CameraDetect(service, camera_readers)
-    q = Queue()
-    detect.detect_realtime_from_cameras_serial(q, "cpu", opt=visualize_occlusion_result, show_image=False,fps=100)
+    q = Queue(maxsize=1000)
+    detect.detect_realtime_from_cameras_serial(q, "cpu", opt=visualize_occlusion_result, show_image=False,fps=10)
+
+
+
+def task_5_V1():
+    save_path = "assets/image"
+    camera_readers = [CameraReader(usb_port=0, save_location=save_path),
+                      CameraReader(usb_port=1, save_location=save_path)]
+    # camera_readers = [CameraReader(usb_port=0,save_location=save_path)]
+    model = OcclusionDetectionModel()
+    service = ModelService(model, r"assets/odm_model/best.pth", "cpu")
+    print("model is loaded")
+    with CameraDetect(service,camera_readers) as detect:
+        q = Queue()
+        detect.detect_realtime_from_cameras_serial(q, "cpu", opt=visualize_occlusion_result, show_image=False,fps=10)
 
 
 if __name__ == "__main__":
     # task_1()
     # task_2()
-    task_5()
+    # task_5()
+    # task_5_t()
+    task_5_V1()
