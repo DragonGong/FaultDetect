@@ -1,4 +1,6 @@
 # read pics from some cameras and detect the fault by resnet
+import logging
+
 from vision_detect.services.detect import CameraDetect
 from vision_detect.services.model import ModelService
 from vision_detect.data.device.camera import CameraReader
@@ -13,7 +15,7 @@ from PIL import Image
 from typing import List, Tuple
 import tkinter as tk
 
-
+from queue import Queue as tQueue
 def visualize_occlusion_result(
         model_io: ModelIO,
         window_shape: Tuple[int, int] = (2, 2)  # 行数, 列数，比如 (2,2) 表示 2x2 排列窗口
@@ -35,7 +37,7 @@ def visualize_occlusion_result(
     status_text = "Occluded" if frame_result.output_transformed else "Clear"
     color = (0, 0, 255) if frame_result.output_transformed else (0, 255, 0)
     cv2.putText(frame, status_text,
-                (10, frame.shape[0] - 20), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                (10, frame.shape[0] - 200), cv2.FONT_HERSHEY_SIMPLEX, 1,
                 color, 3)
 
     win_name = f"Camera {int(frame_result.ID) - 1}"
@@ -51,7 +53,7 @@ def visualize_occlusion_result(
     offset_x = (screen_w - total_w) // 2
     offset_y = (screen_h - total_h) // 2
 
-    cam_index = int(frame_result.ID) if frame_result.ID.isdigit() else 0
+    cam_index = int(frame_result.ID) -1 if frame_result.ID.isdigit() else 0
     row = cam_index // cols
     col = cam_index % cols
     x = offset_x + col * win_w
@@ -61,6 +63,7 @@ def visualize_occlusion_result(
     cv2.resizeWindow(win_name, win_w, win_h)
 
     cv2.imshow(win_name, frame)
+    cv2.waitKey(1)
 
 
 def task_1():
@@ -121,15 +124,33 @@ def task_5():
     save_path = "assets/image"
     camera_readers = [CameraReader(usb_port=0, save_location=save_path),
                       CameraReader(usb_port=1, save_location=save_path)]
-    # camera_readers = [CameraReader(usb_port=1,save_location=save_path)]
+    # camera_readers = [CameraReader(usb_port=0,save_location=save_path)]
     model = OcclusionDetectionModel()
-    service = ModelService(model, '/Volumes/My Passport/dataset/models/trained/7_22/best.pth', "mps")
+    service = ModelService(model, r"assets/odm_model/best.pth", "cpu")
+    print("model is loaded")
     detect = CameraDetect(service, camera_readers)
-    q = Queue()
-    detect.detect_realtime_from_cameras_serial(q, "mps", opt=visualize_occlusion_result, show_image=True,fps=10)
+    q = Queue(maxsize=1000)
+    detect.detect_realtime_from_cameras_serial(q, "cpu", opt=visualize_occlusion_result, show_image=False,fps=10)
+
+
+
+def task_5_V1():
+    save_path = "assets/image"
+    camera_readers = [CameraReader(usb_port=1, save_location=save_path),
+                      CameraReader(usb_port=2, save_location=save_path),
+                      CameraReader(usb_port=3,save_location=save_path)]
+    # camera_readers = [CameraReader(usb_port=0,save_location=save_path)]
+    model = OcclusionDetectionModel()
+    service = ModelService(model, r"assets/odm_model/best.pth", "cpu")
+    print("model is loaded")
+    with CameraDetect(service,camera_readers) as detect:
+        q = Queue()
+        detect.detect_realtime_from_cameras_serial(q, "cpu", opt=visualize_occlusion_result, show_image=False,fps=10)
 
 
 if __name__ == "__main__":
     # task_1()
     # task_2()
-    task_5()
+    # task_5()
+    # task_5_t()
+    task_5_V1()

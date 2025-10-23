@@ -163,3 +163,14 @@ class CameraDetect:
                 show_image=show_image,
                 opt=opt
             )
+
+    def release_cap(self):
+        for r in self.camera_readers:
+            if r.cap is not None:
+                r.cap.release()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.release_cap()

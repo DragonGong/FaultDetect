@@ -17,7 +17,7 @@ class CameraReader:
         self.usb_port = usb_port
         self.save_location = save_location
         self.image_format = image_format
-
+        self.cap = None
         if not os.path.exists(self.save_location):
             os.makedirs(self.save_location)
 
@@ -30,22 +30,22 @@ class CameraReader:
 
     # basic image read function
     def _read_image_np(self) -> np.ndarray:
-        cap = cv2.VideoCapture(self.usb_port)
-        if not cap.isOpened():
+        if self.cap is None:
+            self.cap = cv2.VideoCapture(self.usb_port)
+        if not self.cap.isOpened():
+            self.cap = cv2.VideoCapture(self.usb_port)
             logging.error(f"无法打开摄像头端口 {self.usb_port}")
             raise IOError(f"无法打开摄像头端口 {self.usb_port}")
 
         while True:
-            ret, frame = cap.read()
-            cap.release()
+            ret, frame = self.cap.read()
 
             if not ret:
                 logging.error(f"无法读取图像帧")
                 time.sleep(1)
-                cap = cv2.VideoCapture(self.usb_port)
+                self.cap = cv2.VideoCapture(self.usb_port)
             else:
                 break
-
         return frame
 
     def read_images_np(self, count=1) -> [np.ndarray]:
@@ -56,7 +56,8 @@ class CameraReader:
         return images
 
     def read_image_plt(self) -> Image.Image:
-        return self._cv2pil(self._read_image_np())
+        frame = self._cv2pil(self._read_image_np())
+        return frame
 
     def read_images_plt(self, count: int) -> List[Image.Image]:
         images = []
