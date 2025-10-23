@@ -37,7 +37,7 @@ def visualize_occlusion_result(
     status_text = "Occluded" if frame_result.output_transformed else "Clear"
     color = (0, 0, 255) if frame_result.output_transformed else (0, 255, 0)
     cv2.putText(frame, status_text,
-                (10, frame.shape[0] - 20), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                (10, frame.shape[0] - 200), cv2.FONT_HERSHEY_SIMPLEX, 1,
                 color, 3)
 
     win_name = f"Camera {int(frame_result.ID) - 1}"
@@ -53,7 +53,7 @@ def visualize_occlusion_result(
     offset_x = (screen_w - total_w) // 2
     offset_y = (screen_h - total_h) // 2
 
-    cam_index = int(frame_result.ID) if frame_result.ID.isdigit() else 0
+    cam_index = int(frame_result.ID) -1 if frame_result.ID.isdigit() else 0
     row = cam_index // cols
     col = cam_index % cols
     x = offset_x + col * win_w
@@ -136,8 +136,9 @@ def task_5():
 
 def task_5_V1():
     save_path = "assets/image"
-    camera_readers = [CameraReader(usb_port=0, save_location=save_path),
-                      CameraReader(usb_port=1, save_location=save_path)]
+    camera_readers = [CameraReader(usb_port=1, save_location=save_path),
+                      CameraReader(usb_port=2, save_location=save_path),
+                      CameraReader(usb_port=3,save_location=save_path)]
     # camera_readers = [CameraReader(usb_port=0,save_location=save_path)]
     model = OcclusionDetectionModel()
     service = ModelService(model, r"assets/odm_model/best.pth", "cpu")
