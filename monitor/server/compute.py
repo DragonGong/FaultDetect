@@ -91,7 +91,7 @@ class TrajectoryIntegrator:
         sgw_gyro_x = signals.get('SGW_IVI_GyroX', 0) * 0.001
         sgw_gyro_y = signals.get('SGW_IVI_GyroY', 0) * 0.001
         sgw_gyro_z = signals.get('SGW_IVI_GyroZ', 0) * 0.001
-        acu_yaw_rate = signals.get('ACU_YawRateSt', 0) * 3 * np.pi / 180  # 示例转换
+        acu_yaw_rate = signals.get('ACU_YawRateSt', 0) * np.pi / 180  # 示例转换
         steering_angle = signals.get('TAS_SAS_SteeringAngle', 0) / 16.0
 
         # 更新航向角

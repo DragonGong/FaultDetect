@@ -1,7 +1,7 @@
 import time
 
 from monitor.client.visualizer import Visualizer
-HOST = "127.0.0.1"
+HOST = "192.168.126.45"
 PORT = 12345
 if __name__ == "__main__":
     v = Visualizer(host=HOST,port=PORT)
