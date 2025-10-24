@@ -93,7 +93,10 @@ class TrajectoryIntegrator:
         sgw_gyro_z = signals.get('SGW_IVI_GyroZ', 0) * 0.001
         acu_yaw_rate = signals.get('ACU_YawRateSt', 0) * np.pi / 180  # 示例转换
         steering_angle = signals.get('TAS_SAS_SteeringAngle', 0) / 16.0
+        pdcu_actual_gear = signals.get('PDCU_ActualGear',3) # default D , P:0 ,R:1, N:2,D:3
 
+        if pdcu_actual_gear == 1:
+            vehicle_speed = -vehicle_speed
         # 更新航向角
         if acu_yaw_rate != 0:
             self.current_heading += acu_yaw_rate * dt
@@ -142,7 +145,7 @@ class TrajectoryIntegrator:
     def _process_loop(self):
         while self.running:
             self.put_data(self.can_reader.get_latest_data())
-            time.sleep(0.1)
+            # time.sleep(0.1)
 
     @property
     def lock(self):

@@ -35,7 +35,7 @@ class CANReader:
             self.target_signals =  [
                 'SGW_IVI_GyroX', 'SGW_IVI_GyroY', 'SGW_IVI_GyroZ',
                 'SGW_IVI_AccelX', 'SGW_IVI_AcceY', 'SGW_IVI_AccelZ',
-                'ACU_YawRateSt', 'IBC_VehicleSpeed', 'TAS_SAS_SteeringAngle'
+                'ACU_YawRateSt', 'IBC_VehicleSpeed', 'TAS_SAS_SteeringAngle','PDCU_ActualGear'
             ]
             # 加载DBC文件
         try:
