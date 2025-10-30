@@ -54,6 +54,7 @@ class MultiCameraFusion(Model):
             batch_first=False
         )
         self.classifier = nn.Linear(embed_dim, num_classes)
+        self.classifier_all = nn.Linear(embed_dim, num_classes)
 
     def forward(self, x):
         B, N, C, H, W = x.shape
@@ -65,8 +66,9 @@ class MultiCameraFusion(Model):
         fused = self.attn(feats)  # [N, B, 512]
         fused = fused.permute(1, 0, 2)  # [B, N, 512]
 
-        logits = self.classifier(fused)  # [B, N, num_classes]
-        return logits
+        global_cls = self.classifier_all(fused.mean(dim=1,keepdim=True))
+        logits_cls = self.classifier(fused)  # [B, N, num_classes]
+        return logits_cls, global_cls
 
     @staticmethod
     def transform_func():
@@ -97,7 +99,7 @@ class MultiCameraFusion(Model):
         return image_input
 
     def transform_output(self, output: ModelIO):
-        _, batch_max_list = output.mcf_io.output_origin.max(2)
+        _, batch_max_list = output.mcf_io.output_origin[0].max(2)
         batch_max_list = batch_max_list[0]
         for value in batch_max_list:
             output.mcf_io.output_transformed.append(value.item())
