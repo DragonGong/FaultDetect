@@ -14,8 +14,8 @@ transform = transforms.Compose(
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ]
 )
-dataset = OcclusionDetectionDataset(data_dir='/Volumes/My Passport/dataset/kitti/data2/train',
-                                    label_file='/Volumes/My Passport/dataset/kitti/data2/train/labels.txt',
+dataset = OcclusionDetectionDataset(data_dir='/Volumes/My Passport/dataset/kitti/data2_plus/train',
+                                    label_file='/Volumes/My Passport/dataset/kitti/data2_plus/train/labels.txt',
                                     transform=transform
                                     )
 train_size = int(0.7 * len(dataset))
@@ -73,7 +73,7 @@ def train_model(model, train_loader, val_loader, loss_func, opt, device=torch.de
         if val_loss < best_val_loss:
             best_model = model.state_dict().copy()
             best_val_loss = val_loss
-            torch.save(best_model, '/Volumes/My Passport/dataset/models/trained/7_22/best.pth')
+            torch.save(best_model, '/Volumes/My Passport/dataset/models/trained/10_26_odm/best.pth')
             print(f'Saved best model at epoch {epoch + 1}')
         print(f'Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.2f}%')
     model.load_state_dict(best_model)
@@ -83,4 +83,4 @@ def train_model(model, train_loader, val_loader, loss_func, opt, device=torch.de
 if __name__ == '__main__':
     # 随便改的
     model = train_model(model, train_loader, val_loader, loss, opt, device, 30)
-    torch.save(model.state_dict(), '/Volumes/My Passport/dataset/models/trained/7_22/final.pth')
+    torch.save(model.state_dict(), '/Volumes/My Passport/dataset/models/trained/10_26_odm/final.pth')

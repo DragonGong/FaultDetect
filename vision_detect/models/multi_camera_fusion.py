@@ -85,7 +85,8 @@ class MultiCameraFusion(Model):
         return transform(image)
 
     # todo:fix it
-    def preprocess(self, image: Image.Image, device: str) -> torch.Tensor:
+    def preprocess(self, io: ModelIO, device: str) -> torch.Tensor:
+        image: Image.Image = io.mcf_io.input
         if device == "" or device is None:
             device = torch.device('cuda' if torch.cuda.is_available() else "cpu")
         t = self.transform_val(image).to(device)

@@ -19,6 +19,8 @@ from PIL import Image
 class QueueWrap:
     frame: Image.Image
     camera_id: str
+    frames: [Image.Image]
+    camera_ids: [str]
 
 
 class CameraDetect:
@@ -101,6 +103,23 @@ class CameraDetect:
             if opt is not None:
                 opt(output_io)
 
+    def _process_frames_by_queuewrap_parallel(self,
+                                     queue: Queue,
+                                     device: Optional[str],
+                                     show_image: bool,
+                                     opt: Optional[Callable[[ModelIO, ...], None]]) -> None:
+        while True:
+            wrap: QueueWrap = queue.get()
+            frames = wrap.frames
+            camera_ids = wrap.camera_ids
+            # todo:temporary plan: show_image should stay in class camera
+            io = ModelIO()
+            io.mcf_io.input = frames
+            io.mcf_io.ids = camera_ids
+            output_io = self.model_service.predict(device=device, io=io)
+            if opt is not None:
+                opt(output_io)
+
     def detect_realtime_from_one_camera(self, queue: Queue = None, device: Optional[str] = None, fps: int = 1,
                                         get_switch: bool = False, opt: Optional[Callable[[ModelIO], None]] = None,
                                         show_image: bool = False):
@@ -144,6 +163,17 @@ class CameraDetect:
                 q.put(QueueWrap(frame=c.read_image_plt(), camera_id=str(c.usb_port)))
             time.sleep(TimeUtils.seconds_per_frame(f))
 
+    @staticmethod
+    def realtime_read_by_queuewrap_together(q: Queue, f: int, readers: List[CameraReader]):
+        while True:
+            frames = []
+            camera_id = []
+            for c in readers:
+                frames.append(c.read_image_plt())
+                camera_id.append(str(c.usb_port))
+            q.put(QueueWrap(frames=frames, camera_ids=camera_id,frame=None,camera_id=None))
+            time.sleep(TimeUtils.seconds_per_frame(f))
+
     def detect_realtime_from_cameras_serial(self, queue: Queue = None, device: Optional[str] = None, fps: int = 1,
                                             get_switch: bool = False,
                                             opt: Optional[Callable[[ModelIO, ...], None]] = None,
@@ -158,6 +188,26 @@ class CameraDetect:
         p.start()
         if not get_switch:
             self._process_frames_by_queuewrap(
+                queue=queue,
+                device=device,
+                show_image=show_image,
+                opt=opt
+            )
+
+    def detect_realtime_from_cameras_parallel(self, queue: Queue = None, device: Optional[str] = None, fps: int = 1,
+                                            get_switch: bool = False,
+                                            opt: Optional[Callable[[ModelIO, ...], None]] = None,
+                                            show_image: bool = False):
+        if queue is None:
+            queue = Queue()
+            get_switch = False
+
+        # todo:realtime_read is replaced by class camera_reader's function
+        p = Process(target=CameraDetect.realtime_read_by_queuewrap_together, args=(queue, fps, self.camera_readers))
+        p.daemon = True
+        p.start()
+        if not get_switch:
+            self._process_frames_by_queuewrap_parallel(
                 queue=queue,
                 device=device,
                 show_image=show_image,
