@@ -2,6 +2,7 @@ import torch.cuda
 
 from vision_detect.models.model import Model
 from vision_detect.models.model import ModelIO
+from vision_detect.models.output import IoCategory
 from PIL import Image
 
 
@@ -19,7 +20,10 @@ class ModelService:
 
     def predict(self, device: str, io: ModelIO) -> ModelIO:
         input_tensor = self.model.preprocess(io, device)
-        io.odm_io.output_origin = self.model(input_tensor)
+        if io.category == IoCategory.Odm:
+            io.odm_io.output_origin = self.model(input_tensor)
+        else:
+            io.mcf_io.output_origin = self.model(input_tensor)
         self.model.transform_output(io)
         output = io
         return output

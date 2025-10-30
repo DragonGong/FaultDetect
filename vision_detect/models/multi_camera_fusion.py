@@ -86,11 +86,15 @@ class MultiCameraFusion(Model):
 
     # todo:fix it
     def preprocess(self, io: ModelIO, device: str) -> torch.Tensor:
-        image: Image.Image = io.mcf_io.input
+        frames = io.mcf_io.input
+        image_list = []
         if device == "" or device is None:
             device = torch.device('cuda' if torch.cuda.is_available() else "cpu")
-        t = self.transform_val(image).to(device)
-        return t
+        for frame in frames:
+            image_list.append(self.transform_val(frame).to(device))
+        image_tensor = torch.stack(image_list)
+        image_input = image_tensor.unsqueeze(0)
+        return image_input
 
     def transform_output(self, output: ModelIO):
         _, batch_max_list = output.mcf_io.output_origin.max(2)

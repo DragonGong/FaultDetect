@@ -1,4 +1,5 @@
 import cv2
+from vision_detect.models.output import IoCategory
 from vision_detect.utils.image import ImageUtils
 import time
 from vision_detect.utils.time import TimeUtils
@@ -113,7 +114,7 @@ class CameraDetect:
             frames = wrap.frames
             camera_ids = wrap.camera_ids
             # todo:temporary plan: show_image should stay in class camera
-            io = ModelIO()
+            io = ModelIO(category=IoCategory.Mcf)
             io.mcf_io.input = frames
             io.mcf_io.ids = camera_ids
             output_io = self.model_service.predict(device=device, io=io)
