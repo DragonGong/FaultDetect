@@ -68,7 +68,7 @@ class CANReader:
         try:
             self.bus = can.interface.Bus(
                 channel=self.channel,
-                bustype='vector',
+                bustype='kvaser',
                 bitrate=self.bitrate,
                 receive_own_messages=False
             )
@@ -105,13 +105,16 @@ class CANReader:
                 msg = self.bus.recv(timeout=0.5)
                 if msg is None:
                     continue
-
+                # print(f"msg is {msg}")
                 try:
                     decoded = self.db.decode_message(msg.arbitration_id, msg.data)
+                    # print(f"raw data is {decoded}")
                     # 检查是否有目标信号
                     has_target = False
                     for name, value in decoded.items():
                         if name in self.target_signals:
+                            # if name == 'PDCU_ActualGear':
+                            #     print(f"PDCU_ActualGear signal is {decoded}")
                             self.latest_data["signals"][name] = value
                             has_target = True
 

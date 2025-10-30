@@ -8,7 +8,7 @@ from typing import Dict, Any, List
 import cantools
 import can
 from monitor.server.can_reader import CANReader
-
+import math 
 # ========================
 # 配置参数
 # ========================
@@ -93,10 +93,12 @@ class TrajectoryIntegrator:
         sgw_gyro_z = signals.get('SGW_IVI_GyroZ', 0) * 0.001
         acu_yaw_rate = signals.get('ACU_YawRateSt', 0) * np.pi / 180  # 示例转换
         steering_angle = signals.get('TAS_SAS_SteeringAngle', 0) / 16.0
-        pdcu_actual_gear = signals.get('PDCU_ActualGear',3) # default D , P:0 ,R:1, N:2,D:3
+        pdcu_actual_gear = signals.get('PDCU_ActualGear',4) # default D , P:5 ,R:7, N:0,D:4
 
-        if pdcu_actual_gear == 1:
+        if pdcu_actual_gear == 7:
             vehicle_speed = -vehicle_speed
+            sgw_accel_x=-sgw_accel_x
+            sgw_accel_y=-sgw_accel_y
         # 更新航向角
         if acu_yaw_rate != 0:
             self.current_heading += acu_yaw_rate * dt
@@ -104,7 +106,7 @@ class TrajectoryIntegrator:
             self.current_heading += sgw_gyro_z * dt
 
         # 计算速度
-        if vehicle_speed > 0.1:  # 使用车速
+        if abs(vehicle_speed) > 0.1:  # 使用车速
             velocity_x = vehicle_speed * np.cos(self.current_heading)
             velocity_y = vehicle_speed * np.sin(self.current_heading)
         else:  # 积分加速度
@@ -145,7 +147,7 @@ class TrajectoryIntegrator:
     def _process_loop(self):
         while self.running:
             self.put_data(self.can_reader.get_latest_data())
-            # time.sleep(0.1)
+            time.sleep(0.1)
 
     @property
     def lock(self):

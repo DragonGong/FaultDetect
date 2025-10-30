@@ -49,7 +49,7 @@ class DataBroadcaster:
             # 广播给所有客户端
             try:
                 self.server.broadcast(latest_data)
-                print(f"broad data :{latest_data}")
+                # print(f"broad data :{latest_data}")
             except Exception as e:
                 print(f"广播异常: {e}")
 
