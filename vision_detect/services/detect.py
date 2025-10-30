@@ -161,7 +161,7 @@ class CameraDetect:
     def realtime_read_by_queuewrap(q: Queue, f: int, readers: List[CameraReader]):
         while True:
             for c in readers:
-                q.put(QueueWrap(frame=c.read_image_plt(), camera_id=str(c.usb_port)))
+                q.put(QueueWrap(frame=c.read_image_plt(), camera_id=str(c.usb_port),frames = None,camera_ids= None))
             time.sleep(TimeUtils.seconds_per_frame(f))
 
     @staticmethod
