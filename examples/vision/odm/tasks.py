@@ -136,13 +136,13 @@ def task_5():
 
 def task_5_V1():
     save_path = "assets/image"
-    # camera_readers = [CameraReader(usb_port=1, save_location=save_path),
-    #                   CameraReader(usb_port=2, save_location=save_path),
-    #                   CameraReader(usb_port=3,save_location=save_path)]
-    camera_readers = [CameraReader(usb_port=0,save_location=save_path),
-                      CameraReader(usb_port=1,save_location=save_path)]
+    camera_readers = [CameraReader(usb_port=1, save_location=save_path),
+                      CameraReader(usb_port=2, save_location=save_path),
+                      CameraReader(usb_port=0,save_location=save_path)]
+    # camera_readers = [CameraReader(usb_port=0,save_location=save_path),
+    #                   CameraReader(usb_port=1,save_location=save_path)]
     model = OcclusionDetectionModel()
-    service = ModelService(model, r"assets/odm_model/best.pth", "cpu")
+    service = ModelService(model, r"assets/odm_model/1026/best.pth", "cpu")
     print("model is loaded")
     with CameraDetect(service,camera_readers) as detect:
         q = Queue()

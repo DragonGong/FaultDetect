@@ -5,13 +5,13 @@ from monitor.server.can_reader import CANReader
 from monitor.server.compute import TrajectoryIntegrator
 from monitor.server.server import SocketServer
 
-DBC_FILE = r'E:\code\FaultDetect\assets\20250626.dbc'
+DBC_FILE = r'.\assets\监测信号+20251024(2).dbc'
 CAN_CHANNEL = 0
 BITRATE = 500000
 TARGET_SIGNAL = [
     'SGW_IVI_GyroX', 'SGW_IVI_GyroY', 'SGW_IVI_GyroZ',
     'SGW_IVI_AccelX', 'SGW_IVI_AcceY', 'SGW_IVI_AccelZ',
-    'ACU_YawRateSt', 'IBC_VehicleSpeed', 'TAS_SAS_SteeringAngle'
+    'ACU_YawRateSt', 'IBC_VehicleSpeed', 'TAS_SAS_SteeringAngle','PDCU_ActualGear'
 ]
 MAX_QUEUE_SIZE = 100
 SERVER_HOST = '0.0.0.0'
