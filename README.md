@@ -132,8 +132,3 @@ cp config/config-example.yaml config/config.yaml
    - 降低刷新频率或减少绘图负载；
    - 在无图形界面环境下使用本地桌面或转存日志。
 
----
-
-## License
-
-如需开源发布，建议在仓库根目录补充 `LICENSE` 文件并在此处声明。
