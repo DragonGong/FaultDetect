@@ -1,3 +1,82 @@
-./assets/logfile
-./assets/dmo.txt
-./config/config.yaml
+# Project-local files
+/assets/logfile
+/assets/dmo.txt
+/config/config.yaml
+!/config/config-example.yaml
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+*.so
+
+# Python build and packaging output
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+pip-wheel-metadata/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Test, lint, type-check, and coverage caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs and temporary files
+*.log
+logs/
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Experiment outputs and generated data
+/outputs/
+/runs/
+/wandb/
+/mlruns/
+/checkpoints/
+/weights/
+/data/
+/datasets/
+
+# Model/export artifacts generated during experiments
+*.ckpt
+*.onnx
+*.engine
+*.pt
+*.pth
+!/assets/mcf_model/best.pth
+!/assets/mcf_model/final.pth
+!/assets/odm_model/best.pth
+!/assets/odm_model/final.pth
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
